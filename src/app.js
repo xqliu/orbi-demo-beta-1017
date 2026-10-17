@@ -1,12 +1,21 @@
-import { addTodo, toggleTodo, removeTodo, clearCompleted, visibleTodos, remainingCount } from "./todo.js";
+import { addTodo, toggleTodo, removeTodo, clearCompleted, visibleTodos, remainingCount, loadTodos, saveTodos } from "./todo.js";
 
-let todos = [
+const sampleTodos = [
   { id: 1, title: "Buy milk", done: true },
   { id: 2, title: "Reply to Sam's email", done: true },
   { id: 3, title: "Book a dentist appointment", done: false },
   { id: 4, title: "Water the plants", done: false },
   { id: 5, title: "Pay the electricity bill", done: false },
 ];
+// The list lives in the browser (localStorage), so a refresh keeps it. If the
+// browser blocks storage, the page still works with the sample tasks.
+let storage = null;
+try {
+  storage = window.localStorage;
+} catch {
+  // Keep the list in memory when storage is unavailable.
+}
+let todos = loadTodos(storage) ?? sampleTodos;
 let filter = "all";
 
 const form = document.querySelector("#new-todo");
@@ -39,6 +48,7 @@ function render() {
     box.checked = todo.done;
     box.addEventListener("change", () => {
       todos = toggleTodo(todos, todo.id);
+      saveTodos(storage, todos);
       render();
       focusTask("input", index);
       status.textContent = box.checked ? "Task completed." : "Task marked active.";
@@ -52,6 +62,7 @@ function render() {
     del.setAttribute("aria-label", `Delete ${todo.title}`);
     del.addEventListener("click", () => {
       todos = removeTodo(todos, todo.id);
+      saveTodos(storage, todos);
       render();
       focusTask("button", index);
       status.textContent = "Task deleted.";
@@ -86,6 +97,7 @@ form.addEventListener("submit", (event) => {
     return;
   }
   todos = addTodo(todos, input.value);
+  saveTodos(storage, todos);
   filter = "all";
   input.value = "";
   clearError();
@@ -102,6 +114,7 @@ for (const button of filters) {
 }
 clearButton.addEventListener("click", () => {
   todos = clearCompleted(todos);
+  saveTodos(storage, todos);
   render();
   focusTask("input", 0);
   status.textContent = "Completed tasks cleared.";
