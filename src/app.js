@@ -1,4 +1,4 @@
-import { addTodo, toggleTodo, removeTodo, clearCompleted, visibleTodos } from "./todo.js";
+import { addTodo, toggleTodo, removeTodo, clearCompleted, visibleTodos, remainingCount } from "./todo.js";
 
 let todos = [
   { id: 1, title: "Buy milk", done: true },
@@ -16,6 +16,7 @@ const status = document.querySelector("#app-status");
 const error = document.querySelector("#input-error");
 const empty = document.querySelector("#empty-list");
 const clearButton = document.querySelector("#clear-completed");
+const itemsLeft = document.querySelector("#items-left");
 const filters = document.querySelectorAll("[data-filter]");
 
 // Rerendering removes focused controls. Return focus to the same task or its
@@ -27,6 +28,8 @@ function focusTask(selector, index) {
 
 function render() {
   const visible = visibleTodos(todos, filter);
+  const remaining = remainingCount(todos);
+  itemsLeft.textContent = `${remaining} ${remaining === 1 ? "item" : "items"} left`;
   list.replaceChildren(...visible.map((todo, index) => {
     const item = document.createElement("li");
     const label = document.createElement("label");
