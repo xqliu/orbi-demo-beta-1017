@@ -1,4 +1,4 @@
-import { addTodo, toggleTodo, removeTodo, visibleTodos } from "./todo.js";
+import { addTodo, toggleTodo, removeTodo, clearCompleted, visibleTodos } from "./todo.js";
 
 let todos = [
   { id: 1, title: "Buy milk", done: true },
@@ -15,6 +15,7 @@ const list = document.querySelector("#list");
 const status = document.querySelector("#app-status");
 const error = document.querySelector("#input-error");
 const empty = document.querySelector("#empty-list");
+const clearButton = document.querySelector("#clear-completed");
 const filters = document.querySelectorAll("[data-filter]");
 
 // Rerendering removes focused controls. Return focus to the same task or its
@@ -65,6 +66,7 @@ function render() {
   for (const button of filters) {
     button.setAttribute("aria-pressed", String(button.dataset.filter === filter));
   }
+  clearButton.disabled = !todos.some((todo) => todo.done);
 }
 
 function clearError() {
@@ -95,4 +97,10 @@ for (const button of filters) {
     status.textContent = `Showing ${filter} tasks.`;
   });
 }
+clearButton.addEventListener("click", () => {
+  todos = clearCompleted(todos);
+  render();
+  focusTask("input", 0);
+  status.textContent = "Completed tasks cleared.";
+});
 render();
