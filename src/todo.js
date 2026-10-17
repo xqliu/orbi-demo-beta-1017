@@ -20,6 +20,10 @@ export function clearCompleted(todos) {
   return todos.filter((t) => !t.done);
 }
 
+export function remainingCount(todos) {
+  return todos.filter((t) => !t.done).length;
+}
+
 export function visibleTodos(todos, filter) {
   if (filter === "active") return todos.filter((t) => !t.done);
   if (filter === "done") return todos.filter((t) => t.done);
